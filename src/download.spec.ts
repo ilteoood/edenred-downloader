@@ -54,7 +54,7 @@ const downloadBarCode = async (barCode: string) => {
   const barCodePrettified = barCode.replaceAll('-', '')
 
   const response = await fetch(`https://portaleclienti.edenred.it/ResponsiveLink/printPDFNominativiAction.do?barcode=${barCodePrettified}&save=true`)
-  const destinationDirectory = join(__dirname, 'pdf')
+  const destinationDirectory = join(import.meta.dirname, 'pdf')
 
   await mkdir(destinationDirectory, { recursive: true })
   const fileStream = createWriteStream(join(destinationDirectory, `${barCodePrettified}.pdf`));
