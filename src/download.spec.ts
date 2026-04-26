@@ -1,12 +1,11 @@
 import { Page, test } from '@playwright/test';
-import dotenv from 'dotenv';
 import { createWriteStream } from 'fs';
 import { mkdir } from 'fs/promises';
 import { join } from 'path';
 import { pipeline } from 'stream/promises';
 import { setTimeout } from 'timers/promises';
 
-dotenv.config();
+process.loadEnv();
 
 declare global {
   namespace NodeJS {
