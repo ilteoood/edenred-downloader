@@ -1,9 +1,9 @@
-import { Page, test } from '@playwright/test';
-import { createWriteStream } from 'fs';
-import { mkdir } from 'fs/promises';
-import { join } from 'path';
-import { pipeline } from 'stream/promises';
-import { setTimeout } from 'timers/promises';
+import { createWriteStream } from "node:fs";
+import { mkdir } from "node:fs/promises";
+import { join } from "node:path";
+import { pipeline } from "node:stream/promises";
+import { setTimeout } from "node:timers/promises";
+import { type Page, test } from "@playwright/test";
 
 process.loadEnv();
 
@@ -15,70 +15,76 @@ declare global {
   }
 }
 
-const retrieveBarCode = (page: Page) => page.locator('.codeLine').innerText()
-const retrieveNextPageButton = (page: Page) => page.locator('.pagerContainer > div > div:nth-child(5) > a > img')
+const retrieveBarCode = (page: Page) => page.locator(".codeLine").innerText();
+const retrieveNextPageButton = (page: Page) =>
+  page.locator(".pagerContainer > div > div:nth-child(5) > a > img");
 
 const hasNextPage = async (page: Page) => {
-  const nextPageButton = retrieveNextPageButton(page)
+  const nextPageButton = retrieveNextPageButton(page);
 
-  const imgSrc = await nextPageButton.getAttribute('src', {timeout: 10_000}).catch(() => 'blankFreccia')
-  return !imgSrc?.includes('blankFreccia')
-}
+  const imgSrc = await nextPageButton
+    .getAttribute("src", { timeout: 10_000 })
+    .catch(() => "blankFreccia");
+  return !imgSrc?.includes("blankFreccia");
+};
 
 const goNextPage = async (page: Page) => {
-  const nextPageButton = retrieveNextPageButton(page)
-  const responsePromise = page.waitForResponse('https://portaleclienti.edenred.it/ResponsiveLink/viewNominativeVoucherFirstLoadAction.do')
-  await nextPageButton.click()
-  await responsePromise
-}
+  const nextPageButton = retrieveNextPageButton(page);
+  const responsePromise = page.waitForResponse(
+    "https://portaleclienti.edenred.it/ResponsiveLink/viewNominativeVoucherFirstLoadAction.do"
+  );
+  await nextPageButton.click();
+  await responsePromise;
+};
 
 const retrieveBarCodes = async (page: Page) => {
-  const barCodes: string[] = []
+  const barCodes: string[] = [];
 
-  while(true) {
+  while (true) {
     await setTimeout(5000);
-    const barCode = await retrieveBarCode(page)
-    console.log('Retrieved bar code', barCode)
-    barCodes.push(barCode)
+    const barCode = await retrieveBarCode(page);
+    console.log("Retrieved bar code", barCode);
+    barCodes.push(barCode);
     if (!(await hasNextPage(page))) {
-      break
+      break;
     }
-    await goNextPage(page)
+    await goNextPage(page);
   }
 
-  return barCodes
-}
+  return barCodes;
+};
 
 const downloadBarCode = async (barCode: string) => {
-  const barCodePrettified = barCode.replaceAll('-', '')
+  const barCodePrettified = barCode.replaceAll("-", "");
 
-  const response = await fetch(`https://portaleclienti.edenred.it/ResponsiveLink/printPDFNominativiAction.do?barcode=${barCodePrettified}&save=true`)
-  const destinationDirectory = join(import.meta.dirname, 'pdf')
+  const response = await fetch(
+    `https://portaleclienti.edenred.it/ResponsiveLink/printPDFNominativiAction.do?barcode=${barCodePrettified}&save=true`
+  );
+  const destinationDirectory = join(import.meta.dirname, "pdf");
 
-  await mkdir(destinationDirectory, { recursive: true })
-  const fileStream = createWriteStream(join(destinationDirectory, `${barCodePrettified}.pdf`));
+  await mkdir(destinationDirectory, { recursive: true });
+  const fileStream = createWriteStream(
+    join(destinationDirectory, `${barCodePrettified}.pdf`)
+  );
 
-  await pipeline(
-    response.body!,
-    fileStream
-  )
-}
+  await pipeline(response.body as NodeJS.ReadableStream, fileStream);
+};
 
 const downloadBarCodes = async (barCodes: string[]) => {
   for (const barCode of barCodes) {
-    console.log('Downloading bar code', barCode)
-    await downloadBarCode(barCode)
+    console.log("Downloading bar code", barCode);
+    await downloadBarCode(barCode);
   }
-}
+};
 
-test('download all', async ({ page }) => {
+test("download all", async ({ page }) => {
   await page.goto(process.env.INITIAL_URL);
 
-  const barCodes = await retrieveBarCodes(page)
+  const barCodes = await retrieveBarCodes(page);
 
-  console.log('Retrieved bar codes')
-  console.table(barCodes)
+  console.log("Retrieved bar codes");
+  console.table(barCodes);
   await setTimeout(5000);
 
-  await downloadBarCodes(barCodes)
+  await downloadBarCodes(barCodes);
 });
