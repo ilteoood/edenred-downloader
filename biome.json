@@ -6,7 +6,7 @@
     "useIgnoreFile": false
   },
   "files": {
-    "ignore": []
+    "includes": ["**/*.ts", "**/*.js", "**/*.json", "**/*.jsonc"]
   },
   "formatter": {
     "enabled": true,
@@ -28,7 +28,7 @@
       "arrowParentheses": "always",
       "bracketSameLine": false,
       "bracketSpacing": true,
-      "quoteProps": "asNeeded"
+      "quoteProperties": "asNeeded"
     }
   }
 }
