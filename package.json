@@ -1,0 +1,24 @@
+{
+  "name": "edenred-downloader",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "postinstall": "playwright install",
+    "lint": "biome check .",
+    "format": "biome format ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "playwright": "^1.61.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.0",
+    "@playwright/test": "^1.61.0",
+    "@types/node": "^25.9.4"
+  }
+}
