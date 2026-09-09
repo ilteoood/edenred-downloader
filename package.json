@@ -14,7 +14,7 @@
   "description": "",
   "dependencies": {
     "dotenv": "^17.4.2",
-    "playwright": "^1.62.1"
+    "playwright": "^1.63.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.11",
