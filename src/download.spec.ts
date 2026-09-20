@@ -1,12 +1,12 @@
 import { createWriteStream } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
+import { loadEnvFile } from "node:process";
 import { pipeline } from "node:stream/promises";
 import { setTimeout } from "node:timers/promises";
 import { type Page, test } from "@playwright/test";
-import dotenv from "dotenv";
 
-dotenv.config();
+loadEnvFile();
 
 declare global {
   namespace NodeJS {
